@@ -2,9 +2,6 @@ package com.example.calculateway;
 
 import android.app.Activity;
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,7 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.TextView;
 
-public class Town extends Activity implements SensorEventListener, LocationListener{
+public class Town extends Activity implements LocationListener{
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -29,18 +26,7 @@ public class Town extends Activity implements SensorEventListener, LocationListe
 		mLocationManager.requestLocationUpdates(provider, 0, 0, this);
 			
 	}
-		
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
