@@ -12,8 +12,10 @@ import android.widget.TextView;
 import android.text.format.Time;
 
 public class MainActivity extends Activity implements LocationListener{
-	Location location, oldLocation;
-	Time time, oldTime;
+	Location location;
+	Location oldLocation;
+	Time time = new Time("Asia/Tokyo");
+	Time oldTime;
 
 	@Override
 	protected void onStart(){
@@ -23,42 +25,51 @@ public class MainActivity extends Activity implements LocationListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		
-		LocationManager mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-		criteria.setPowerRequirement(Criteria.POWER_LOW);
-		String provider = mLocationManager.getBestProvider(criteria, true);
-		mLocationManager.requestLocationUpdates(provider, 0, 0, this);
-		
-		TextView dateText = (TextView)findViewById(R.id.date_id);
-		time = new Time("Asia/Tokyo");
-		time.setToNow();
-		String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
-		dateText.setText(date);
+		setContentView(R.layout.activity_main);		
 	}
 	
 	public void startCalc(View view){
 		float[] result = new float[3];
 		if(oldLocation == null){	//初めの1回
-			oldLocation = location;
+			time.setToNow();
 			oldTime = time;
+			TextView dateText = (TextView)findViewById(R.id.date_id);
+			String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
+			dateText.setText(date);
+
+			LocationManager mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+			Criteria criteria = new Criteria();
+			criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+			criteria.setPowerRequirement(Criteria.POWER_LOW);
+			String provider = mLocationManager.getBestProvider(criteria, true);
+			mLocationManager.requestLocationUpdates(provider, 0, 0, this);		
+			oldLocation = location;			
+			
 		} else {					//それ以降
+			time.setToNow();
+			oldTime = time;
+			TextView dateText = (TextView)findViewById(R.id.newDate_id);
+			String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
+			dateText.setText(date);
+			
+			TextView tv_lat = (TextView)findViewById(R.id.newLatitude);
+			tv_lat.setText("現在の緯度: "+location.getLatitude());
+
+			TextView tv_lng = (TextView)findViewById(R.id.newLongitude);
+			tv_lng.setText("現在の経度: "+location.getLongitude());
+
 			Location.distanceBetween(oldLocation.getLatitude(),
 			oldLocation.getLongitude(), 
 			location.getLatitude(),
 			location.getLongitude(),
 			result);
 			oldLocation = location;
-			time.setToNow();
-			oldTime = time;
-			TextView dateText = (TextView)findViewById(R.id.date_id);
-			String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
-			dateText.setText(date);
+
+			
 			TextView distanceText = (TextView)findViewById(R.id.distance_id);
 			String distance = "移動距離: " + result[0] + "m";
 			distanceText.setText(distance);
+
 		}
 	}
 
@@ -66,12 +77,12 @@ public class MainActivity extends Activity implements LocationListener{
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 		TextView tv_lat = (TextView)findViewById(R.id.Latitude);
-		tv_lat.setText("緯度: "+location.getLatitude());
+		tv_lat.setText("現在の緯度: "+location.getLatitude());
 
 		TextView tv_lng = (TextView)findViewById(R.id.Longitude);
-		tv_lng.setText("経度: "+location.getLongitude());
+		tv_lng.setText("現在の経度: "+location.getLongitude());
 		
-		this.location = location;
+//		this.location = location;
 	}
 
 	@Override

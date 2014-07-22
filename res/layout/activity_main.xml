@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,42 +8,75 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.calculate.MainActivity$PlaceholderFragment" >
-    <TextView
-        android:id="@+id/date_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-  	<TextView
-        android:id="@+id/Latitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp" />
-    <TextView
-        android:id="@+id/Longitude"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp" />
- 
-    <TextView
-        android:id="@+id/distance_id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/are_you_ready"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/ready" />
     
-    <Button 
-        android:id="@+id/go_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/go_button"
-        android:background="#808080"
-        android:onClick="startCalc" />
+    <TableRow >
+        <TextView
+    	    android:id="@+id/date_id"
+   	 	    android:layout_width="wrap_content"
+   	 	  	android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+    	    android:id="@+id/newDate_id"
+   	 	    android:layout_width="wrap_content"
+   	 	  	android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+    </TableRow>
     
-  
-</LinearLayout>
+    <TableRow >
+        <TextView
+            android:id="@+id/Latitude"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/newLatitude"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+    </TableRow>
+    
+    <TableRow >
+	    <TextView
+    	    android:id="@+id/Longitude"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+	    <TextView
+    	    android:id="@+id/newLongitude"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+     	    android:textAppearance="?android:attr/textAppearanceLarge" />
+    </TableRow>
+    
+    <TableRow >
+        <TextView
+        	android:id="@+id/distance_id"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:textAppearance="?android:attr/textAppearanceLarge" />        
+    </TableRow>
+    
+    <TableRow >
+        <TextView
+        	android:id="@+id/time_id"
+       		android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:textAppearance="?android:attr/textAppearanceLarge" />        
+    </TableRow>
+    
+    <TableRow >
+        <TextView
+        	android:id="@+id/are_you_ready"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:textAppearance="?android:attr/textAppearanceLarge"
+        	android:text="@string/ready" />
+    	<Button 
+        	android:id="@+id/go_button"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="@string/go_button"
+        	android:background="#808080"
+        	android:onClick="startCalc" />
+    </TableRow>
+</TableLayout>
