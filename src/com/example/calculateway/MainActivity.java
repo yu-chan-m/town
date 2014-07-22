@@ -1,45 +1,94 @@
 package com.example.calculateway;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.text.format.Time;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements LocationListener{
+	Location location, oldLocation;
+	Time time, oldTime;
 
-	public static String TAG = "MainActivity";
-	
-	public void goTown(View view){
-		Log.d(TAG, "goTown");
-		Intent intent = new Intent(this, Town.class);
-		startActivityForResult(intent, 0);
+	@Override
+	protected void onStart(){
+		super.onStart();
 	}
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.flagment_main);
+		setContentView(R.layout.activity_main);
+		
+		LocationManager mLocationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		String provider = mLocationManager.getBestProvider(criteria, true);
+		mLocationManager.requestLocationUpdates(provider, 0, 0, this);
+		
+		TextView dateText = (TextView)findViewById(R.id.date_id);
+		time = new Time("Asia/Tokyo");
+		time.setToNow();
+		String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
+		dateText.setText(date);
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+	
+	public void startCalc(View view){
+		float[] result = new float[3];
+		if(oldLocation == null){	//初めの1回
+			oldLocation = location;
+			oldTime = time;
+		} else {					//それ以降
+			Location.distanceBetween(oldLocation.getLatitude(),
+			oldLocation.getLongitude(), 
+			location.getLatitude(),
+			location.getLongitude(),
+			result);
+			oldLocation = location;
+			time.setToNow();
+			oldTime = time;
+			TextView dateText = (TextView)findViewById(R.id.date_id);
+			String date = "現在の時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
+			dateText.setText(date);
+			TextView distanceText = (TextView)findViewById(R.id.distance_id);
+			String distance = "移動距離: " + result[0] + "m";
+			distanceText.setText(distance);
 		}
-		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// TODO Auto-generated method stub
+		TextView tv_lat = (TextView)findViewById(R.id.Latitude);
+		tv_lat.setText("緯度: "+location.getLatitude());
+
+		TextView tv_lng = (TextView)findViewById(R.id.Longitude);
+		tv_lng.setText("経度: "+location.getLongitude());
+		
+		this.location = location;
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		
 	}
 }
