@@ -1,16 +1,27 @@
 package com.example.calculateway;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends Activity {
+
+	public static String TAG = "MainActivity";
+	
+	public void goTown(View view){
+		Log.d(TAG, "goTown");
+		Intent intent = new Intent(this, Town.class);
+		startActivityForResult(intent, 0);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.flagment_main);
 	}
 
 	@Override
