@@ -2,6 +2,9 @@ package com.example.calculateway;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -11,13 +14,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.text.format.Time;
 
-public class MainActivity extends Activity implements LocationListener{
+public class MainActivity extends Activity implements LocationListener, SensorEventListener{
 	Location location = new Location("Asia/Tokyo");
 	Location oldLocation;
 	Location saveLocation;
 	Time time = new Time("Asia/Tokyo");
 	Time oldTime;
 	Time saveTime;
+	float[] result = new float[3];
 
 	@Override
 	protected void onStart(){
@@ -42,56 +46,38 @@ public class MainActivity extends Activity implements LocationListener{
 			time.setToNow();
 			oldTime = new Time(time);
 			oldLocation = new Location(location);			
-
 			TextView dateText = (TextView)findViewById(R.id.date_id);
-			String date = "スタート時刻: " + oldTime.hour + "時" + oldTime.minute + "分" + oldTime.second + "秒";
-			dateText.setText(date);
-			
 			TextView tv_lat = (TextView)findViewById(R.id.Latitude);
-			tv_lat.setText("スタート緯度: "+oldLocation.getLatitude());
-
 			TextView tv_lng = (TextView)findViewById(R.id.Longitude);
+
+			String date = "スタート時刻: " + oldTime.hour + "時" + oldTime.minute + "分" + oldTime.second + "秒";
+			dateText.setText(date);			
+			tv_lat.setText("スタート緯度: "+oldLocation.getLatitude());
 			tv_lng.setText("スタート経度: "+oldLocation.getLongitude());
 	}
 	
 	public void goalCalc(View view){
-		float[] result = new float[3];
+		TextView newDateText = (TextView)findViewById(R.id.newDate_id);
+		TextView lat = (TextView)findViewById(R.id.newLatitude);
+		TextView lng = (TextView)findViewById(R.id.newLongitude);
+		TextView distanceText = (TextView)findViewById(R.id.distance_id);
+		TextView timeText = (TextView)findViewById(R.id.costTime_id);
+		TextView velocityText = (TextView)findViewById(R.id.velocity_id);
+		TextView tv_lat = (TextView)findViewById(R.id.Latitude);
 
 		if(oldTime != null && oldLocation != null){
-			TextView dateText = (TextView)findViewById(R.id.date_id);
-			String date = "スタート時刻: " + oldTime.hour + "時" + oldTime.minute + "分" + oldTime.second + "秒";
-			dateText.setText(date);
-
-			TextView oldLat = (TextView)findViewById(R.id.Latitude);
-			oldLat.setText("スタート緯度: "+oldLocation.getLatitude());
-
-			TextView oldLng = (TextView)findViewById(R.id.Longitude);
-			oldLng.setText("スタート経度: "+oldLocation.getLongitude());
-
 			time.setToNow();
 
-			TextView newDateText = (TextView)findViewById(R.id.newDate_id);
 			String newDate = "ゴール時刻: " + time.hour + "時" + time.minute + "分" + time.second + "秒";
 			newDateText.setText(newDate);
-
-			TextView lat = (TextView)findViewById(R.id.newLatitude);
 			lat.setText("ゴール緯度: "+location.getLatitude());
-
-			TextView lng = (TextView)findViewById(R.id.newLongitude);
 			lng.setText("ゴール経度: "+location.getLongitude());
 
-			Location.distanceBetween(oldLocation.getLatitude(),
-					oldLocation.getLongitude(), 
-					location.getLatitude(),
-					location.getLongitude(),
-					result);
-
-			TextView distanceText = (TextView)findViewById(R.id.distance_id);
-			String distance = "移動距離: " + result[0] + "m";
-			distanceText.setText(distance);
-
-			TextView timeText = (TextView)findViewById(R.id.costTime_id);
+			distanceText.setText(calcDistance(location, oldLocation));
 			timeText.setText(calcTime(time, oldTime));
+			velocityText.setText(calcVelocity(result, time, oldTime));
+		} else {
+			tv_lat.setText("スタートしてください");
 		}
 	}
 
@@ -114,14 +100,29 @@ public class MainActivity extends Activity implements LocationListener{
 		}
 	}
 	
+	private String calcDistance(Location location, Location oldlocation){
+		Location.distanceBetween(oldlocation.getLatitude(),
+				oldlocation.getLongitude(), 
+				location.getLatitude(),
+				location.getLongitude(),
+				result);
+
+		return "移動距離: " + result[0] + "m";
+	}
+	
 	private String calcTime(Time time, Time oldtime){
 		int cHour, cMinute, cSecond;
-		cHour = time.hour - oldtime.hour;
-		cMinute = time.minute - oldtime.minute;
-		cSecond = time.second - oldtime.second;
-		if(cSecond < 0){ cSecond += 60; cMinute -= 1; }
-		if(cMinute < 0){ cMinute += 60; cHour -= 1; }
+		long mills = time.normalize(false) - oldTime.normalize(false);
+		cHour = (int) (mills / (60 * 60 * 1000));		
+		cMinute = (int) (mills % (60 * 60 * 1000) / (60 * 1000));		
+		cSecond = (int) (mills % (60 * 1000) / 1000);
 		return "所要時間: " + cHour + "時間" + cMinute + "分" + cSecond + "秒";
+	}
+	
+	private String calcVelocity(float[] distance, Time time, Time oldtime){
+		long mills = time.normalize(false) - oldTime.normalize(false);
+		float vel = distance[0] / mills * 3600;
+		return "平均速度: " + vel + "km/h";
 	}
 	
 	@Override
@@ -144,6 +145,18 @@ public class MainActivity extends Activity implements LocationListener{
 
 	@Override
 	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// TODO Auto-generated method stub
 		
 	}
