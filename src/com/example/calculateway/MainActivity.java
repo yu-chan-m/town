@@ -57,7 +57,8 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 		String provider = mLocationManager.getBestProvider(criteria, true);
 		mLocationManager.requestLocationUpdates(provider, 0, 0, this);		
 		//For compass
-		surface = (SurfaceView)findViewById(R.id.compass);
+		View view = findViewById(R.id.compass);
+		surface = (SurfaceView) view;
 	}
 
 	@Override
