@@ -1,17 +1,25 @@
 package com.example.calculateway;
 
+import java.lang.ref.WeakReference;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.text.format.Time;
 
 public class MainActivity extends Activity implements LocationListener, SensorEventListener{
@@ -22,6 +30,15 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 	Time oldTime;
 	Time saveTime;
 	float[] result = new float[3];
+
+	 //方位センサー関係
+	private SensorManager manager;
+	private boolean isSensorResisted = false;
+	Bitmap needleImg;
+
+	//SurfaceViewへの描画関係
+	SurfaceView surface;
+	private CompassHandler compassHandler;
 
 	@Override
 	protected void onStart(){
@@ -39,7 +56,55 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 		criteria.setPowerRequirement(Criteria.POWER_LOW);
 		String provider = mLocationManager.getBestProvider(criteria, true);
 		mLocationManager.requestLocationUpdates(provider, 0, 0, this);		
+		//For compass
+		surface = (SurfaceView)findViewById(R.id.compass);
 	}
+
+	@Override
+	 protected void onResume() {
+	  super.onResume();
+
+	  //センサーの起動
+	  if (manager == null) {
+	   manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+	  }
+	  List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ORIENTATION);
+	  if (sensors.size() > 0) {
+	   isSensorResisted = manager.registerListener(this, sensors.get(0), SensorManager.SENSOR_DELAY_FASTEST);
+	   
+	   //針の画像をロード
+	   needleImg = BitmapFactory.decodeResource(getResources(), R.drawable.needle);
+	   
+	   
+	   //Handlerを起動
+	   compassHandler = new CompassHandler();
+	   compassHandler.SetMe(new WeakReference<MainActivity>(this));
+	   compassHandler.setAlive();
+	  } else {
+	   //方位磁石センサーがなければメッセージを表示
+	   Toast.makeText(getApplicationContext(), "No Orientaion Sensor!", Toast.LENGTH_LONG).show();
+	  }
+	 }
+	@Override
+	 protected void onPause() {
+	  super.onPause();
+
+	  //センサーの終了
+	  if (isSensorResisted) {
+	   manager.unregisterListener(this);
+	   isSensorResisted = false;
+	   
+	   //ループフラグ・オフ
+	   compassHandler.unsetAlive();
+	   
+	   //Handlerにメッセージが残っていれば削除
+	   compassHandler.removeMessages(CompassHandler.WHAT);
+	   
+	   //針画像の解放
+	   needleImg.recycle();
+	  }
+	 }
+
 	
 	public void startCalc(View view){
 
@@ -148,16 +213,20 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
-	public void onSensorChanged(SensorEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
+	 public void onSensorChanged(SensorEvent event) {
+	  switch (event.sensor.getType()) {
+	  case Sensor.TYPE_ORIENTATION:
+	   //北向きをゼロ度とする方位の角度
+	   compassHandler.setOrientation(event.values[0]);
+	   
+	   //Handlerで針画像の描画
+	   compassHandler.sendEmptyMessage(CompassHandler.WHAT);
+	   break;
+	  }
+	 }
 
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
-		
-	}
+	 @Override
+	 public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	 }
 }
