@@ -148,8 +148,15 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 	}
 
 	public void saveTown(View view){
+		time.setToNow();
 		saveLocation = new Location(location);
 		saveTime = new Time(time);
+		TextView loadDateText = (TextView)findViewById(R.id.saveDate_id);
+		TextView loadlat = (TextView)findViewById(R.id.saveLatitude);
+		TextView lng = (TextView)findViewById(R.id.saveLongitude);
+		loadDateText.setText("現在の情報を保存しました");
+		loadlat.setText("");
+		lng.setText("");
 	}
 	public void loadTown(View view){
 		TextView loadDateText = (TextView)findViewById(R.id.saveDate_id);
@@ -173,7 +180,7 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 				location.getLongitude(),
 				result);
 
-		return "移動距離: " + result[0] + "m";
+		return "移動距離: " + result[0]/1000 + "km";
 	}
 	
 	private String calcTime(Time time, Time oldtime){
