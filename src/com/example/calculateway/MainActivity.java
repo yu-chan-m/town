@@ -195,7 +195,7 @@ public class MainActivity extends Activity implements LocationListener, SensorEv
 	private String calcVelocity(float[] distance, Time time, Time oldtime){
 		long mills = time.normalize(false) - oldTime.normalize(false);
 		float vel = distance[0] / mills * 3600;
-		return "平均速度: " + vel + "km/h";
+		return "平均時速: " + vel + "km/h";
 	}
 	
 	@Override
